@@ -7,7 +7,7 @@
 - [x] M4 execute RTL directed/random differential tests; repair failures.
 - [x] M5 process synthesis/structural checks for core and concrete RAM fabric.
 - [x] M6 external-input hardening, sanitizer/static analysis, CI and documentation.
-- [ ] Final current-source generic gate synthesis replay after negative-offset fix.
+- [x] Final current-source generic gate synthesis replay after negative-offset fix.
 - [ ] Execute remote Linux / actual GNU GCC CI matrix (configuration committed,
   local `gcc` is a clang alias and is not independent compiler evidence).
 

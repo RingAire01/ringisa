@@ -21,7 +21,7 @@ results and security review will be appended before the final checkpoint.
 
 `python scripts/build.py --test --sanitize`:
 
-- PASS11171 C architectural checks; same suite also linked through `libringisa.a`.
+- PASS11176 C architectural checks; same suite also linked through `libringisa.a`.
 - PASS180 independent Python scalar arithmetic cases; all51 opcode round trips,
   illegal-word preservation, mixed lengths, labels and interactive debugger.
 - PASS121 hostile/malformed/resource/publication-failure cases, preserving
@@ -50,6 +50,20 @@ results and security review will be appended before the final checkpoint.
 - PASS core and RAM process synthesis, no structural problems/latches. Current
   core has13593 RTLIL cells with inferred memories; not a physical area number.
 
+`python scripts/rtl.py --gates`: PASS current-source full generic gate synthesis
+using `synth -top ringisa_core -noabc`, after the negative-offset fix.912445
+generic one-bit cells; no memories/processes remaining; `check -assert` reports
+zero problems and latch assertion passes. This is a generic logic netlist,
+**not** standard-cell/FPGA technology mapping, timing or mobile PPA validation.
+Output: `target/core-gates.json`, log: `target/gate-synthesis.log` (ignored).
+
+Final replay of `python scripts/build.py --test --sanitize` and
+`python scripts/rtl.py --test --synth` returned exit0 on the implementation
+checkpoint `7b9905b7cc951636ef875981fca0045ea14cdc71`; captured logs are
+`target/final-software.log` and `target/final-rtl.log`. Debug sanitizer and
+Release builds were also executed. Actual local GNU GCC and Linux execution
+remain unverified; local `gcc --version` identifies clang22.1.8.
+
 ## Repairs and failed attempts (resolved)
 
 - Icarus initial local installer required elevation and was not used; validated
@@ -65,8 +79,8 @@ results and security review will be appended before the final checkpoint.
 - Manual address audit found inverted negative-offset overflow logic. Replaced
   with129th-bit test; added standalone134-vector and two whole-core regressions.
 - Stale full gate run was intentionally canceled after the address fix. Its
-  termination status is not an unresolved implementation failure. Final-source
-  gate replay must succeed before updating the pending gate release flag.
+  termination status is not an unresolved implementation failure. Replacement
+  final-source gate replay passed and supersedes that canceled attempt.
 
 Icarus informational `sensitivity-entire-array` warnings are disabled explicitly:
 whole-array combinational sensitivity is required for the associative CAMs,
