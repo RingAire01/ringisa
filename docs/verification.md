@@ -92,3 +92,8 @@ No FPGA board, standard-cell library, place/route, timing closure, mobile power
 or performance, Linux/GNU GCC runtime in this local environment, formal proof,
 production security certification, REO compiler port or live third-party CI.
 See `security.md` for threat boundaries and accepted residual risks.
+# Phase 2 integration verification
+
+New SoC results, synthesis distinctions, actual failed FPGA experiment and
+reproducible commands are in [the SoC verification ledger](soc/verification.md).
+The following sections retain the original reference-core verification record.

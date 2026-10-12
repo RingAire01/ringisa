@@ -1,0 +1,10 @@
+; Machine interrupt handler, only R40/R41 and R30/R31 modified.
+CSRR R31,1
+MOVI R40,0
+ST.32 R40,R12,8
+MOVI R40,1
+ST.32 R40,R12,12
+ST.32 R40,R13,8
+ADDI R30,R30,1
+ST.32 R31,R10,4
+ERET

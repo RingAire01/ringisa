@@ -17,6 +17,10 @@ def main():
     target=ROOT/'target';target.mkdir(exist_ok=True)
     compiler=os.environ.get('CC','clang');flags=['-std=c11','-Wall','-Wextra','-Wpedantic','-Werror']
     flags += {'Release':['-O3','-DNDEBUG'],'Debug':['-O0','-g3'],'Alpha':['-O2','-g']}[args.config]
+    # MS CRT deprecates ISO C functions regardless of actual bounded usage.
+    # Keep the portable C11 implementation (exclusive fopen mode, bounded text)
+    # rather than replacing it with incompatible Microsoft-only *_s APIs.
+    if os.name=='nt':flags+=['-D_CRT_SECURE_NO_WARNINGS']
     if args.sanitize:flags+=['-fsanitize=address,undefined','-g']
     suffix='.exe' if os.name=='nt' else ''
     common=['tools/common/generated.c','tools/common/value.c','tools/common/io.c']

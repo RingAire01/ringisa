@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "clock_hz": 50000000,
+  "regions": [
+    {"name":"ROM","base":0,"size":16384,"writable":false},
+    {"name":"RAM","base":65536,"size":131072,"writable":true},
+    {"name":"UART","base":1048576,"size":4096,"writable":true},
+    {"name":"TIMER","base":1052672,"size":4096,"writable":true},
+    {"name":"IRQ","base":1056768,"size":4096,"writable":true}
+  ],
+  "registers": {
+    "UART": {"TX":0,"RX":4,"STATUS":8,"CONTROL":12,"DIVISOR":16},
+    "TIMER": {"COUNT":0,"COMPARE":4,"CONTROL":8,"PENDING":12},
+    "IRQ": {"PENDING":0,"MASK":4,"ACK":8,"ACTIVE":12}
+  }
+}

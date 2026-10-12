@@ -18,16 +18,26 @@ jobs:
         env:
           CC: ${{ matrix.compiler }}
   hardware:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: sudo apt-get update && sudo apt-get install -y iverilog yosys clang
+      - uses: YosysHQ/setup-oss-cad-suite@aefa8397bbf8fc6670a0a62af9805a89738f3cde
+        with:
+          version: '2026-10-11'
+          github-token: ${{ github.token }}
+      - run: sudo apt-get update && sudo apt-get install -y clang
       - run: python scripts/build.py --test --sanitize
       - run: python scripts/analyze.py
-      - run: python scripts/rtl.py --test --synth
+      - run: python scripts/rtl.py --test --synth --soc
+      - name: Check authoritative generated tables and boot sources
+        run: |
+          python tools/specgen/generate.py
+          python tools/specgen/soc.py
+          git diff --exit-code -- tools/common/generated.c tools/common/generated.h rtl/decode docs/instructions.md rtl/soc/map.svh docs/soc/address-map.md examples/soc
       - uses: actions/upload-artifact@v4
         if: always()
         with:

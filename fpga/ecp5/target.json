@@ -1,0 +1,8 @@
+{
+  "device":"LFE5U-85F",
+  "package":"CABGA381",
+  "speed":6,
+  "clock_mhz":25,
+  "status":"feasibility-only; no board pins or hardware qualification",
+  "top":"ringisa_soc_fpga"
+}
