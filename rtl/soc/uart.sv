@@ -13,6 +13,7 @@ module ringisa_uart #(parameter CLOCK_HZ=50000000,parameter BAUD=115200)(
   begin merge=old;for(integer i=0;i<4;i=i+1)if(mask[i])merge[i*8+:8]=value[i*8+:8];end
  endfunction
  wire [31:0] new_divisor=merge(divisor,data,strobes);
+ wire consume_rx=select&&!error&&!write&&offset==`SOC_UART_RX;
  always @*begin
   read_data=0;error=0;
   case(offset)
@@ -33,11 +34,12 @@ module ringisa_uart #(parameter CLOCK_HZ=50000000,parameter BAUD=115200)(
     if(tx_bits==9)begin busy<=0;tx_event<=1;end
     else begin tx_shift<={1'b1,tx_shift[9:1]};tx_bits<=tx_bits+1;tx_count<=divisor-1;end
    end else tx_count<=tx_count-1;end
+   if(consume_rx)rx_ready<=0;
    case(rx_state)
     0:if(!rx_sync)begin rx_state<=1;rx_count<=divisor/2-1;end
     1:if(rx_count==0)begin if(rx_sync)rx_state<=0;else begin rx_state<=2;rx_count<=divisor-1;end end else rx_count<=rx_count-1;
     2,3,4,5,6,7,8,9:if(rx_count==0)begin rx_shift[rx_state-2]<=rx_sync;rx_state<=rx_state+1;rx_count<=divisor-1;end else rx_count<=rx_count-1;
-    10:if(rx_count==0)begin rx_state<=0;if(!rx_sync)framing<=1;else if(rx_ready)overrun<=1;else begin rx_byte<=rx_shift;rx_ready<=1;end end else rx_count<=rx_count-1;
+    10:if(rx_count==0)begin rx_state<=0;if(!rx_sync)framing<=1;else if(rx_ready&&!consume_rx)overrun<=1;else begin rx_byte<=rx_shift;rx_ready<=1;end end else rx_count<=rx_count-1;
     default:rx_state<=0;
    endcase
    if(select&&!error)begin
@@ -47,7 +49,6 @@ module ringisa_uart #(parameter CLOCK_HZ=50000000,parameter BAUD=115200)(
      `SOC_UART_DIVISOR:divisor<=new_divisor;
      default:begin end
     endcase
-    else if(offset==`SOC_UART_RX)rx_ready<=0;
    end
   end
  end

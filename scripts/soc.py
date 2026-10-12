@@ -26,11 +26,12 @@ def main():
     sources=sorted(str(s.relative_to(ROOT)).replace('\\','/') for s in (ROOT/'rtl').rglob('*.sv'))
     if args.test:
         iv,vvp=find('iverilog'),find('vvp')
-        for top in ['soc_tb','bus_tb','adapter_tb','lite_tb']:
+        for top in ['soc_tb','bus_tb','adapter_tb','lite_tb','uart_tb']:
             run([iv,'-g2012','-Wall','-Wno-sensitivity-entire-array','-Irtl/decode','-Irtl/soc','-s',top,'-o',TARGET/(top+'.vvp'),*sources,'tests/soc/'+top+'.sv'],top+'-compile.log')
         print(run([vvp,TARGET/'bus_tb.vvp'],'soc-bus.log'))
         print(run([vvp,TARGET/'adapter_tb.vvp'],'soc-adapter.log'))
         print(run([vvp,TARGET/'lite_tb.vvp'],'soc-lite.log'))
+        print(run([vvp,TARGET/'uart_tb.vvp'],'soc-uart-races.log'))
         manifest=json.loads((TARGET/'soc/manifest.json').read_text())
         suffix='.exe' if os.name=='nt' else ''
         flags=['-D_CRT_SECURE_NO_WARNINGS'] if os.name=='nt' else []

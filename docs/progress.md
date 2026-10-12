@@ -10,7 +10,7 @@ C architecture/RAM-write replays pass, including combined acceptance and full
 128-bit paged execution/fault return. Bus217 transactions, adapter41 logical
 transactions, direct AXI-Lite16 checks pass. Software sanitizer regression and
 10-unit clang analysis pass. Four SoC process synthesis targets pass; integrated
-30907 RTLIL cells/1365760 memory bits, not FPGA LUTs. Peripheral ECP5 mapping
+30911 RTLIL cells/1365760 memory bits, not FPGA LUTs. Peripheral ECP5 mapping
 passes; complete mapping fails in ABC9 with Windows stack overflow, intermediate
 184743 FF exceeds85F capacity. No PNR, timing, hardware or power claim.
 

@@ -50,6 +50,10 @@ opcode definitions have not been extended.
 - AXI-Lite direct slave:16 checks, reverse AW/W order, read while partial write
   queued, partial/zero strobes, held responses, invalid regions/offsets and four
   reset positions. None of these use an always-success fake peripheral.
+- Four dedicated UART checks verify RX completion simultaneous with an empty
+  RX read or consuming an older byte, unread-byte overrun and read-clear.
+  New-byte publication wins over read-clear; no frame silently disappears.
+- All eight C architecture replays also passed standalone ASan/UBSan execution.
 
 ## Synthesis / implementation distinction
 
@@ -81,6 +85,9 @@ Logs: `target/fpga-soc-mapping.log`, `target/fpga-peripherals-mapping.log`.
    compatibility exception does not disable compiler correctness diagnostics.
 4. A120-second aggregate local synthesis attempt timed out; standalone
    synthesis rerun completed. Timeout was not recorded as a synthesis pass.
+5. Final review found simultaneous UART read/completion could clear a newly
+   received byte. Clear now precedes publication, and a read frees the existing
+   slot for a new frame on that clock. Four directed regression checks pass.
 
 No board execution, PNR/timing closure, power measurement, formal AXI proof,
 arbitrary external slave atomicity, DDR or multi-master validation. Reset
@@ -88,19 +95,27 @@ aborts execution and may preserve partial RAM transfer bytes; it is not an
 architectural exception. Malicious/broken master timeout recovery is not defined.
 Remote CI status is recorded only after actual GitHub execution observation.
 
+Observed GitHub run [38288535516](https://github.com/RingAire01/ringisa/actions/runs/38288535516)
+for integration commit `ef7ad3e59790c63395eadd3cea844decf9caaa63`: **success**.
+All five jobs passed: Windows/Linux clang/gcc software matrix and Linux
+hardware/sanitizers/analysis/full core+SoC tests/synthesis/generated consistency.
+This includes genuine remote Linux GNU GCC execution, not the local wrapper.
+The later UART race fix is verified separately by local tests and its own CI;
+the earlier green run does not claim coverage of that subsequent revision.
+
 ## Final local synthesis statistics
 
 | Hierarchical top | Primitive RTLIL cells | Inferred memory bits |
 |---|---:|---:|
 | CPU AXI adapter |217|0|
 | AXI router with initialized ROM and RAM |16777|1179648|
-| Peripheral subsystem |288|0|
-| Integrated initialized SoC |30907|1365760|
+| Peripheral subsystem |292|0|
+| Integrated initialized SoC |30911|1365760|
 
 These counts include initialization/read/write RTLIL cells, not bit-level gates
 or LUTs. All four process/check/latch assertions returned exit0. Peripheral-only
-ECP5 mapping:669 LUT4,360 TRELLIS_FF,280 CCU2C,129 PFUMX,17 L6MUX21
-(1458 cells including3 scope records), structural check0 problems. No PNR.
+ECP5 mapping:632 LUT4,360 TRELLIS_FF,280 CCU2C,107 PFUMX,5 L6MUX21
+(1387 cells including3 scope records), structural check0 problems. No PNR.
 Full core26384 decode/16 differential regression rerun passed alongside SoC;
 clang analysis covered10 C translation units, no diagnostics.
 

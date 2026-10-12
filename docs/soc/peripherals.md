@@ -10,6 +10,8 @@ regions DECERR. Registers default zero unless explicitly stated below.
   is SLVERR, no new frame. Empty byte0 strobe has no transmit side effect.
 - RX, read only: low8 received byte. Reading clears RX-ready. No RX FIFO;
   one unread byte is retained and a later valid byte sets sticky overrun.
+  A simultaneous read consumes the old byte and permits new-byte publication;
+  RX completion wins over read-clear even if the slot was previously empty.
 - STATUS, read only: bit0 TX-ready, bit1 RX-ready, bit2 overrun, bit3 framing.
 - CONTROL: bit0 enables RX-ready IRQ; writing bit1 clears overrun/framing.
   Bit1 is a command, not retained. All other bits ignored/reserved for platform.
