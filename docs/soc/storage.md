@@ -40,6 +40,7 @@ python scripts/storage.py
 python scripts/storage.py --compare 434b1ca
 python scripts/storage.py --full --top ram --top registers
 python scripts/storage.py --compare 434b1ca --full --top registers
+python scripts/storage.py --full --top registers --simulate-registers target/oss-cad-suite/share/yosys/lattice
 python scripts/fpga.py --map --pnr
 python scripts/fpga.py --map --pnr --lut-mapper abc
 ```
@@ -90,6 +91,14 @@ CAM tags and wide arithmetic remain substantial resource/timing risks.
 The same full-mapping command measured the historical register file at16128 FF
 and0 distributed RAM primitives; the new file has16064 fewer FF. This is a
 measured module comparison, not an estimate from declared array sizes.
+
+The technology-mapped register-file netlist also passes the same5056-check
+scoreboard using the actual Yosys `common_sim.vh`/`ccu2c_sim.vh` functional
+primitive models. `--simulate-registers` takes the installed Lattice library
+directory explicitly; adjust the example path for your tool installation.
+No source RTL is substituted for the mapped RF. This gate-level test does not
+cover timing delays or a whole mapped CPU. RAM gate simulation is not claimed:
+the supplied DP16KD model is a blackbox, not a functional BRAM model.
 
 After these changes, the combined boot test completes in33075 simulated clocks
 (186 retired instructions,20 UART bytes, one acknowledged timer interrupt).

@@ -35,6 +35,8 @@ jobs:
       - run: python scripts/rtl.py --test --synth --soc
       - name: Check FPGA storage inference
         run: python scripts/storage.py
+      - name: Simulate technology-mapped register file
+        run: python scripts/storage.py --full --top registers --simulate-registers "$(dirname "$(command -v yosys)")/../share/yosys/lattice"
       - name: Check authoritative generated tables and boot sources
         run: |
           python tools/specgen/generate.py

@@ -9,6 +9,7 @@ from collections import Counter
 import json
 import re
 import subprocess
+from pathlib import Path
 
 from rtl import ROOT, TARGET, find, run
 
@@ -74,15 +75,37 @@ def main():
     parser.add_argument('--compare', metavar='REV')
     parser.add_argument('--full', action='store_true')
     parser.add_argument('--top', choices=MODULES, action='append')
+    parser.add_argument('--simulate-registers', metavar='LATTICE_LIBRARY_DIR',
+                        help='with --full: simulate the mapped RF using real Yosys Lattice primitive models')
     args = parser.parse_args()
     if args.compare and not re.fullmatch(r'[0-9a-fA-F]{7,40}', args.compare):
         parser.error('--compare requires a hexadecimal local commit ID')
+    library = Path(args.simulate_registers).resolve() if args.simulate_registers else None
+    if library:
+        if not args.full or 'registers' not in (args.top or MODULES):
+            parser.error('--simulate-registers requires --full and the registers target')
+        for model in ('common_sim.vh', 'ccu2c_sim.vh'):
+            if not (library / model).is_file():
+                parser.error(f'missing functional Lattice model: {library / model}')
     TARGET.mkdir(exist_ok=True)
     summary = [measure(name, revision, args.full)
                for revision in ([args.compare, None] if args.compare else [None])
                for name in (args.top or MODULES)]
     path = TARGET / ('storage-full-summary.json' if args.full else 'storage-inference-summary.json')
     path.write_text(json.dumps(summary, indent=2) + '\n')
+    if library:
+        source = 'target/storage/current/registers-mapped.v'
+        run([find('yosys'), '-Q', '-T', '-p',
+             f'read_json target/storage/current/registers-full.json; write_verilog -noattr -noexpr {source}'],
+            'storage-register-gates-export.log')
+        simulation = TARGET / 'storage/current/registers-mapped.vvp'
+        run([find('iverilog'), '-g2012', '-I', library, '-s', 'register_tb', '-o', simulation,
+             source, library / 'common_sim.vh', library / 'ccu2c_sim.vh', 'tests/rtl/register_tb.sv'],
+            'storage-register-gates-compile.log')
+        output = run([find('vvp'), simulation], 'storage-register-gates-test.log')
+        if 'PASS register file' not in output:
+            raise RuntimeError('mapped register-file scoreboard did not finish')
+        print(output)
     print('PASS storage mapping/inference checks; not place/route, timing or device fit')
 
 
