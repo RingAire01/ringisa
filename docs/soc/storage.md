@@ -157,6 +157,39 @@ which excludes the `map_ram` stage. Its nonzero exit was investigated rather
 than suppressing the guard. The corrected exclusive upper label is
 `begin:map_ffram`; the full standalone mappings above were unaffected.
 
+## Completed classic-ABC mapping and failed device placement
+
+`python scripts/fpga.py --map --pnr --lut-mapper abc` completed full SoC ECP5
+technology mapping and its structural check reported0 problems. This resolves
+the host ABC9 stack failure via a different supported LUT mapping flow, not by
+removing ISA functionality. The mapped top contains305800 cells including32
+scope records:173100 LUT4,127144 TRELLIS_FF,4568 CCU2C,88 DP16KD,
+664 TRELLIS_DPR16X4 and204 MULT18X18D. This is an actual completed mapping,
+unlike the earlier intermediate ABC9 figures.
+
+nextpnr ran for LFE5U-85F/CABGA381/speed6 at requested25 MHz, seed52495341,
+with unconstrained pins permitted for feasibility. Its resource report:
+
+| Resource | Required | Available | Tool-reported utilization |
+|---|---:|---:|---:|
+|TRELLIS_FF|127144|83640|152%|
+|TRELLIS_COMB (packed logic requirement)|187248|83640|223%|
+|MULT18X18D|204|156|130%|
+|DP16KD|88|208|42%|
+
+Placement failed with `no BELs remaining to implement cell type TRELLIS_COMB`
+(nextpnr exit125). **The complete design does not fit this device.** Routing,
+timing closure, achieved Fmax and board execution were not completed. The
+25 MHz command-line target is not an achieved frequency. Packed COMB demand
+is not interchangeable with the173100 pre-pack LUT4 count. No power result.
+
+Artifacts remain ignored: `target/soc-ecp5.json` (mapped netlist),
+`target/fpga-soc-abc-mapping.log` and `target/fpga-soc-pnr.log`. The command
+returns nonzero on the placement failure; no resource/timing check is disabled
+to turn that failure green. The next implementation milestone requires reducing
+CAM/arithmetic demand or choosing a genuinely larger supported device, without
+silently shrinking the architectural state or truncating128-bit addresses.
+
 ## Changed-boundary robustness review
 
 Untrusted guest physical addresses still pass full-width validation before

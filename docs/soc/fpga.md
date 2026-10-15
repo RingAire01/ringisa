@@ -5,6 +5,11 @@ BRAM/LUTRAM mapping, a classic-ABC fallback, new regression tests and a full
 SoC mapping retry. Counts and failures below describe the original Phase2
 checkpoint unless explicitly superseded in that document.
 
+Latest complete experiment: classic-ABC mapping succeeds, but nextpnr placement
+on the85F fails resource capacity (FF152%, COMB223%, DSP130%). No successful
+routing or achieved Fmax. The exact completed mapping and failed placement
+results are recorded in `storage.md`; the older ABC9 failure is historical.
+
 Local portable OSS CAD Suite provides Yosys, nextpnr-ecp5/ice40/nexus/himbaechel,
 Trellis databases and supporting tools. No physical FPGA board is connected.
 Only an open ECP5 device feasibility flow is supplied; no tiny iCE40 chosen to

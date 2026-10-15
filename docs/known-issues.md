@@ -22,5 +22,7 @@
 - Local `gcc` is LLVM's clang wrapper, not independently tested GNU GCC.
   Actual Phase2 remote CI execution status is in `docs/soc/verification.md`.
   Formal proof, broad fault injection and technology-specific timing are not
-  complete. ECP5 peripheral mapping passes; full SoC mapping failed in ABC9
-  with stack overflow after deriving FF demand above85F capacity. No PNR.
+  complete. ECP5 peripheral mapping passes. Full SoC ABC9 mapping hits a host
+  stack overflow; the classic-ABC fallback completes mapping and structural
+  checks. Actual nextpnr placement on85F fails capacity: FF152%, COMB223%,
+  DSP130%. Routing/timing/board validation remain incomplete, not skipped passes.

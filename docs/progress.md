@@ -20,6 +20,14 @@ read `docs/soc/storage.md` for current scope and further mapping results.
 Remaining tasks: large CAM tags/arithmetic resource demand, suitable device,
 measured timing/PNR and actual board integration; no PPA or hardware success.
 
+Final feasibility result: classic-ABC full SoC mapping completed, structural
+check0 problems. Mapped173100 LUT4/127144 FF/88 BRAM/204 DSP. nextpnr actually
+attempted placement on85F and failed: FF152%, packed COMB223%, DSP130%, BRAM42%.
+No routing, achieved Fmax or board result. See `docs/soc/storage.md` for counts,
+commands and actual error. Thus the remaining blocker is demonstrated device
+capacity, not merely the earlier ABC9 host failure. Code revision `ec8d36c`
+passed all five remote CI jobs including mapped register-file simulation.
+
 ## Phase 2 checkpoint (2026-10-13)
 
 Implemented complete single-master SoC under `rtl/soc`: CPU AXI adapter,
