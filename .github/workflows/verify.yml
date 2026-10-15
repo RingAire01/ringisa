@@ -33,6 +33,8 @@ jobs:
       - run: python scripts/build.py --test --sanitize
       - run: python scripts/analyze.py
       - run: python scripts/rtl.py --test --synth --soc
+      - name: Check FPGA storage inference
+        run: python scripts/storage.py
       - name: Check authoritative generated tables and boot sources
         run: |
           python tools/specgen/generate.py

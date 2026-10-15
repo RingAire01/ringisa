@@ -63,6 +63,11 @@ are reported separately from successful simulation/process synthesis.
 
 ## Reference core RTL
 
+FPGA storage inference and reset-safe register/TLB payload improvements are
+documented in [storage implementation](docs/soc/storage.md). Run
+`python scripts/storage.py` for machine-checked ECP5 BRAM/LUTRAM inference;
+this does not claim that the entire CPU fits or meets timing on an FPGA.
+
 SystemVerilog modules are under `rtl/`. `ringisa_core` exposes an atomic physical
 gather/scatter memory interface, debug register read port, retire/trap signals,
 128-bit reset PC and interrupt inputs. See [bus contract](docs/bus.md).

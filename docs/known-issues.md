@@ -13,8 +13,11 @@
 - Assembler emits flat binaries, no ELF linking/debug info/external relocations.
 - No REO compiler target adapter installed; other RingAire projects unchanged.
 - Mobile power/performance objectives are design goals, not validated metrics.
-- Large combinational multipliers and fully associative TLB storage dominate
-  area; current generic synthesis contains912445 one-bit cells. Do not
+- Large combinational multipliers and fully associative TLB tags still dominate
+  area. RAM now has synchronous block-memory inference, register-file reset
+  uses validity bits and TLB/PWC payloads use indexed memory reads; see
+  `docs/soc/storage.md`. Phase1 generic synthesis contained912445 one-bit cells;
+  that historical count does not describe the updated RTL. Do not
   equate that number with ASIC area, FPGA LUT count or a mobile-ready design.
 - Local `gcc` is LLVM's clang wrapper, not independently tested GNU GCC.
   Actual Phase2 remote CI execution status is in `docs/soc/verification.md`.

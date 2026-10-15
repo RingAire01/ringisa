@@ -23,3 +23,9 @@ unknown high PA, malformed AXI accesses and peripheral offsets are covered by
 directed tests. There is no ECC, DDR controller, external cache or power-failure
 persistence guarantee. Neither generic synthesis cells nor initialized ROM
 simulation establish FPGA block-RAM resource fit.
+
+The subsequent [storage inference improvement](storage.md) gives RAM an
+explicit synchronous read port and one extra read-back cycle per enabled byte.
+The transaction contract, full-range validation and reset retention stay the
+same. Standalone128 KiB ECP5 RAM mapping now uses64 DP16KD blocks; this does not
+establish complete SoC device fit or timing closure.

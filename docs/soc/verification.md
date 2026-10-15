@@ -1,5 +1,13 @@
 # Phase 2 verification ledger
 
+## Subsequent storage optimization
+
+The next implementation checkpoint changes RAM/register/TLB/PWC storage without
+changing ISA or cache replacement semantics. Current results and new scoreboards
+are in [storage.md](storage.md); the remainder of this document preserves the
+original Phase2 results, including its failed FPGA mapping experiment. Do not
+apply the old synthesis cell count or exact cycle count to later revisions.
+
 Starting revision `08066a00074a3508b5ba15c41ab1f596cebeeb42`, clean `main`,
 origin `https://github.com/RingAire01/ringisa.git`. Original command
 `python scripts/rtl.py --test --synth` returned exit0, all existing16 CPU

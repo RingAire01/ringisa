@@ -38,13 +38,16 @@ def main():
     TARGET.mkdir(exist_ok=True);sources=sorted(str(p.relative_to(ROOT)).replace('\\','/') for p in (ROOT/'rtl').rglob('*.sv'))
     if args.test:
         iv=find('iverilog');vvp=find('vvp')
-        for top in ['core_tb','mmu_tb','decoder_tb','ram_tb','address_tb']:
+        for top in ['core_tb','mmu_tb','decoder_tb','ram_tb','address_tb','register_tb','cache_tb','ram_storage_tb']:
             # Whole-array sensitivity is intentional for the associative CAMs;
             # Icarus's informational warning describes correct required behavior.
             run([iv,'-g2012','-Wall','-Wno-sensitivity-entire-array','-Irtl/decode','-Irtl/soc','-s',top,'-o',TARGET/(top+'.vvp'),*sources,f'tests/rtl/{top}.sv'],top+'-compile.log')
         print(run([vvp,TARGET/'mmu_tb.vvp'],'mmu-simulation.log'))
         print(run([vvp,TARGET/'ram_tb.vvp'],'ram-simulation.log'))
         print(run([vvp,TARGET/'address_tb.vvp'],'address-simulation.log'))
+        print(run([vvp,TARGET/'register_tb.vvp'],'register-simulation.log'))
+        print(run([vvp,TARGET/'cache_tb.vvp'],'cache-simulation.log'))
+        print(run([vvp,TARGET/'ram_storage_tb.vvp'],'ram-storage-simulation.log'))
         suffix='.exe' if os.name=='nt' else ''
         vectors=run([TARGET/('ringisa-vectors'+suffix)])
         (TARGET/'decoder-vectors.hex').write_text(vectors)

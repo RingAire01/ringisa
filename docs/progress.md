@@ -1,5 +1,25 @@
 # Progress checkpoint
 
+## Storage implementation checkpoint (2026-10-15)
+
+RAM now uses a synchronous read register and single loader/store write port;
+register-file reset uses per-word validity; TLB/PWC keep original full match
+and round-robin semantics but read selected payloads via indexed memories.
+ISA widths, encodings and exception behavior are unchanged. New scoreboards:
+5056 register port checks,714000 TLB/PWC checks and1301 RAM transactions.
+Original core16-program differential and eight SoC program/C replays pass;
+combined33075 cycles/186 retired/20 UART bytes/one timer interrupt. Software
+sanitizer regression and10-unit static analysis pass. SoC process synthesis:
+28411 RTLIL primitive cells,1366368 memory bits, no structural/latch failures.
+Standalone128 KiB RAM full ECP5 mapping uses64 DP16KD blocks; register file
+uses1024 distributed primitives and64 FF. Complete ABC9 retry still fails with
+Windows stack overflow, but intermediate FF drops184743->129128. This is not
+a completed physical implementation. Reproduce with `scripts/storage.py` and
+read `docs/soc/storage.md` for current scope and further mapping results.
+
+Remaining tasks: large CAM tags/arithmetic resource demand, suitable device,
+measured timing/PNR and actual board integration; no PPA or hardware success.
+
 ## Phase 2 checkpoint (2026-10-13)
 
 Implemented complete single-master SoC under `rtl/soc`: CPU AXI adapter,

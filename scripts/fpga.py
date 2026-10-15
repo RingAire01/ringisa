@@ -7,11 +7,14 @@ import argparse
 import json
 from rtl import ROOT,TARGET,find,run
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--map',action='store_true');p.add_argument('--pnr',action='store_true');p.add_argument('--peripherals',action='store_true');args=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--map',action='store_true');p.add_argument('--pnr',action='store_true');p.add_argument('--peripherals',action='store_true');p.add_argument('--lut-mapper',choices=['abc9','abc'],default='abc9',help='classic ABC is a LUT4-only fallback for ABC9 host stack failures');args=p.parse_args()
     sources=sorted(str(f.relative_to(ROOT)).replace('\\','/') for f in (ROOT/'rtl').rglob('*.sv'))
     config=json.loads((ROOT/'fpga/ecp5/target.json').read_text());top='ringisa_peripherals' if args.peripherals else config['top'];name='peripherals' if args.peripherals else 'soc'
     if args.map:
-        out=run([find('yosys'),'-Q','-T','-p',f'read_verilog -sv -Irtl/decode -Irtl/soc {" ".join(sources)}; synth_ecp5 -top {top} -json target/{name}-ecp5.json; check -assert; stat'],'fpga-'+name+'-mapping.log')
+        flow=f'synth_ecp5 -top {top} -json target/{name}-ecp5.json'
+        if args.lut_mapper=='abc':
+            flow=f'synth_ecp5 -top {top} -run begin:map_luts; abc -lut 4; synth_ecp5 -top {top} -run map_cells: -json target/{name}-ecp5.json'
+        out=run([find('yosys'),'-Q','-T','-p',f'read_verilog -sv -Irtl/decode -Irtl/soc {" ".join(sources)}; {flow}; check -assert; stat'],'fpga-'+name+'-'+args.lut_mapper+'-mapping.log')
         print(out[-2500:]);print('PASS ECP5 technology mapping only; place/route not implied')
     if args.pnr:
         if args.peripherals:raise ValueError('PNR target is the complete SoC only')
