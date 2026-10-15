@@ -100,6 +100,27 @@ No source RTL is substituted for the mapped RF. This gate-level test does not
 cover timing delays or a whole mapped CPU. RAM gate simulation is not claimed:
 the supplied DP16KD model is a blackbox, not a functional BRAM model.
 
+The completed `--compare 434b1ca` inference run reports:
+
+| Module | DP16KD old → new | Distributed primitives old → new | Unmapped memory bits old → new |
+|---|---:|---:|---:|
+|128 KiB RAM|0 →64|65536 →0|0 →0|
+|Register file|0 →0|0 →1024|16384 →0|
+|512-entry TLB|0 →0|0 →512|132608 →101376|
+|32-entry PWC|0 →0|0 →64|8736 →4640|
+
+These are intermediate memory-mapping results, not total mapped FF/LUT counts.
+Unmapped arrays have not yet undergone the later FF expansion/optimization.
+TLB/PWC tags still require substantial storage; payload RAM inference alone
+does not imply the entire CAM fits. All eight old/new inference commands and
+their structural/latch checks completed successfully.
+
+Remote CI for code commit `ec8d36ccdd64dfdb6a0d9ac7ab2d59a3ffddaa31` is
+[successful](https://github.com/RingAire01/ringisa/actions/runs/38674472594):
+all four Windows/Linux compiler jobs and the hardware job passed, including
+storage inference and technology-mapped RF simulation. A documentation-only
+follow-up does not expand the scope of the measured code revision.
+
 After these changes, the combined boot test completes in33075 simulated clocks
 (186 retired instructions,20 UART bytes, one acknowledged timer interrupt).
 The extra40 clocks versus the previous33035 come from synchronous RAM reads;
